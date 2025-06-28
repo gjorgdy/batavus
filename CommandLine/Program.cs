@@ -1,4 +1,5 @@
-﻿using Core.Interfaces;
+﻿using Core.Config;
+using Core.Interfaces;
 using Discord_Bot;
 using dotenv.net;
 
@@ -14,7 +15,7 @@ public class Program(ILogger logger, IDiscordBot discordBot) : IProcess
         var discordBot = new DiscordBot(logger);
         // Login to Discord using the token from environment variables
         DotEnv.Load();
-        string? token = Environment.GetEnvironmentVariable("DISCORD_BOT_TOKEN");
+        string? token = EnvironmentVars.DiscordBotToken;
         if (string.IsNullOrEmpty(token)) throw new Exception("Token not found");
         await discordBot.LoginAsync(token);
         // Create an instance of the Program class

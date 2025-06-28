@@ -24,9 +24,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Update=".env">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
+        <Content Include="..\.env" Link=".env" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
 
 </Project>
