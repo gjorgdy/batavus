@@ -1,13 +1,16 @@
 ﻿using Core.Interfaces;
 using Core.Services;
-using Discord_Bot;
+using Discord;
+using Discord.Interactions;
+using Discord.Rest;
+using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace CommandLine;
+namespace Discord_Bot;
 
 public static class Services
 {
-    private static ServiceProvider Provider => _serviceProvider ??= CreateProvider();
+    public static ServiceProvider Provider => _serviceProvider ??= CreateProvider();
 
     private static ServiceProvider? _serviceProvider;
 
@@ -19,7 +22,15 @@ public static class Services
     {
         var collection = new ServiceCollection()
             .AddSingleton<LoggerService>()
-            .AddSingleton<IDiscordBot, DiscordBot>();
+            .AddSingleton<Bot>()
+            .AddSingleton<InteractionHandler>()
+            .AddSingleton(new DiscordSocketConfig
+            {
+                GatewayIntents = GatewayIntents.Guilds,
+            })
+            .AddSingleton<DiscordSocketClient>()
+            .AddSingleton<IRestClientProvider, DiscordSocketClient>()
+            .AddSingleton<InteractionService>();
         return collection.BuildServiceProvider();
     }
 

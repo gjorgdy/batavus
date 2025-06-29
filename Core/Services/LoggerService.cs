@@ -14,7 +14,9 @@ public class LoggerService
 
     private Task Log(object source, string severity, string message)
     {
-        return Log(source.GetType().ToString(), severity, message);
+        string sourceName = source as string
+            ?? source.GetType().ToString().Split(".").Last();
+        return Log(sourceName, severity, message);
     }
 
     public void CriticalError(object sender, string message) => Log(sender, "Critical", message);
