@@ -1,4 +1,5 @@
 ﻿using Core.Interfaces;
+using Core.Services;
 using Discord;
 using Discord.WebSocket;
 
@@ -9,11 +10,18 @@ public class DiscordBot : IDiscordBot
     private readonly DiscordSocketClient _client;
     private readonly List<SocketChannel> _logChannels = [];
 
-    public DiscordBot(ILogger logger)
+    public DiscordBot(LoggerService logger)
     {
         _client = new DiscordSocketClient();
-        _client.Log += Log;
-        _client.Log += (lm) => logger.Log(lm.Severity.GetHashCode(), lm.ToString());
+        _client.Log += lm => logger.Log(lm.Source, lm.Severity.ToString(), lm.Message);
+        logger.OnLog += async (time, source, severity, message) =>
+        {
+            string constructedMessage = time.TimeOfDay + " ``" + source + " > " + severity + "`` " + message;
+            foreach (var channel in _logChannels)
+            {
+                if (channel is SocketTextChannel textChannel) await textChannel.SendMessageAsync(constructedMessage);
+            }
+        };
     }
 
     public async Task StartAsync()
@@ -31,24 +39,5 @@ public class DiscordBot : IDiscordBot
     public Task StopAsync() => _client.StopAsync();
 
     public Task LoginAsync(string token) => _client.LoginAsync(TokenType.Bot, token);
-
-    private async Task Log(LogMessage msg)
-    {
-        string prefix = msg.Severity switch
-        {
-            LogSeverity.Critical => "🔥",
-            LogSeverity.Error => "⛓️‍💥",
-            LogSeverity.Warning => "⚠️‍",
-            LogSeverity.Info => "ℹ️‍",
-            LogSeverity.Verbose => "🔍‍",
-            LogSeverity.Debug => "🐛‍",
-            _ => "??"
-        };
-        foreach (var channel in _logChannels)
-        {
-            if (channel is SocketTextChannel textChannel)
-                await textChannel.SendMessageAsync(prefix + " ``" + msg.ToString() + "``");
-        }
-    }
 
 }
