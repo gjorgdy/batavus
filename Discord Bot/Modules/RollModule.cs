@@ -1,4 +1,5 @@
-﻿using Discord;
+﻿using Discord_Bot.Utils;
+using Discord;
 using Discord.Interactions;
 using JetBrains.Annotations;
 using Logic.Roll;
@@ -15,16 +16,24 @@ public class RollModule : InteractionModuleBase
     [UsedImplicitly] // This attribute is used to indicate that this method is used implicitly by the Discord library.
     public async Task Roll([Summary("input", "The dice to roll, example; 2d4")] string input)
     {
-        var response = await new RollCommand(input)
-            .Execute();
+        Embed response;
+        try
+        {
+            var result = await new RollCommand(input)
+                .Execute();
 
-        var embed = new EmbedBuilder()
-            .WithTitle("Rolling " + input)
-            .WithDescription($"> {string.Join(" + ", response.Components)}\n**= {response.Total}**")
-            .WithColor(Color.Blue)
-            .Build();
+            response = EmbedUtils.CreateBasicEmbed(
+                "Rolling " + input,
+                $"> {string.Join(" + ", result.Components)}\n**= {result.Total}**",
+                Color.Blue
+            );
+        }
+        catch(Exception e)
+        {
+            response = EmbedUtils.CreateErrorEmbed("Error", e.Message);
+        }
 
-        await RespondAsync(embed: embed);
+        await RespondAsync(embed: response);
     }
 
 }

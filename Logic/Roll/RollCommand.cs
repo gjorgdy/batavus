@@ -25,6 +25,7 @@ public class RollCommand : ICommand<RollResponse>
         .Where(rollable => rollable != null)
         .Select(rollable => rollable!)
         .ToList();
+        if (Rollables.Count == 0) throw new ArgumentException("No rollable components found in input.");
     }
 
     public Task<RollResponse> Execute()
