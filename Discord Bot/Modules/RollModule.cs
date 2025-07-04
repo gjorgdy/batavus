@@ -24,12 +24,13 @@ public class RollModule : InteractionModuleBase
 
             response = EmbedUtils.CreateBasicEmbed(
                 "Rolling " + input,
-                $"> {string.Join(" + ", result.Components)}\n**= {result.Total}**",
+                $"> {string.Join(" ", result.Components)}\n**= {result.Total}**",
                 Color.Blue
             );
         }
         catch(Exception e)
         {
+            Console.Out.WriteLine(e);
             response = EmbedUtils.CreateErrorEmbed("Error", e.Message);
         }
 

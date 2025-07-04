@@ -1,30 +1,32 @@
 ﻿namespace Logic.Roll.Models;
 
-using Modifier = IRollable.Modifier;
-
-public class RollableDice : IRollable
+public class RollableDice : MathComponent, IRollable
 {
-    public readonly int Amount;
-    public readonly int Sides;
-
-    public string InputString => $"{Amount}d{Sides}" + IRollable.ModifierSuffix(Mod);
-    public string OutputString => $"{Result}";
-
-    public int Result { get; private set; }
-    public Modifier Mod { get; init; }
-
-    protected RollableDice(int amount, int sides, Modifier mod)
+    protected enum Modifier
     {
-        Amount = amount;
-        Sides = sides;
-        Mod = mod;
-        Result = -1; // Default value indicating no roll has been made yet
+        KeepHighest,
+        KeepLowest,
+        None
     }
 
-    public static IRollable FromString(string diceString)
+    private readonly int _amount;
+    private readonly int _sides;
+    private readonly Modifier _mod;
+
+    public Random Random { get; init; }
+
+    protected RollableDice(int amount, int sides, Modifier mod, Random random) : base(Type.Value)
+    {
+        _amount = amount;
+        _sides = sides;
+        _mod = mod;
+        Random = random;
+    }
+
+    public static MathComponent FromString(string diceString, Random random)
     {
         // Has 'kh' or 'kl' for keep highest or lowest
-        var mod = IRollable.FilterModifier(diceString);
+        var mod = FilterModifier(diceString);
         // Remove the modifier from the string if it exists
         if (mod != Modifier.None)
         {
@@ -39,39 +41,65 @@ public class RollableDice : IRollable
         {
             throw new ArgumentException("Invalid dice format. Use format like '2d6', '1d20kh', or '3d10kl'.");
         }
-        return new RollableDice(amount, sides, mod);
+        return new RollableDice(amount, sides, mod, random);
     }
 
-    public Task RollTotal(Random random)
+    public async Task<int> Roll()
     {
-        int total = 0;
-        for (int i = 0; i < Amount; i++)
+        switch (_mod)
         {
-            total += random.Next(1, Sides + 1);
+            case Modifier.KeepHighest:
+                return await RollKeepHighest();
+            case Modifier.KeepLowest:
+                return await RollKeepLowest();
+            case Modifier.None:
+            default:
+                return await RollTotal();
         }
-        Result = total;
-        return Task.CompletedTask;
     }
 
-    public Task RollKeepHighest(Random random)
-    {
-        List<int> rolls = [];
-        for (int i = 0; i < Amount; i++)
-        {
-            rolls.Add(random.Next(1, Sides + 1));
-        }
-        Result = rolls.Max();
-        return Task.CompletedTask;
-    }
-
-    public Task RollKeepLowest(Random random)
+    public Task<int> RollTotal()
     {
         List<int> rolls = [];
-        for (int i = 0; i < Amount; i++)
+        for (int i = 0; i < _amount; i++)
         {
-            rolls.Add(random.Next(1, Sides + 1));
+            rolls.Add(Random.Next(1, _sides + 1));
         }
-        Result = rolls.Min();
-        return Task.CompletedTask;
+
+        Result = new ValueModel(rolls.Sum(), $"({string.Join(" + ", rolls)})");
+        return Task.FromResult(Result?.Value ?? -1);
+    }
+
+    public Task<int> RollKeepHighest()
+    {
+        List<int> rolls = [];
+        for (int i = 0; i < _amount; i++)
+        {
+            rolls.Add(Random.Next(1, _sides + 1));
+        }
+
+        Result = new ValueModel(rolls.Max(), $"({string.Join(", ", rolls)})kh");
+        return Task.FromResult(Result?.Value ?? -1);
+    }
+
+    public Task<int> RollKeepLowest()
+    {
+        List<int> rolls = [];
+        for (int i = 0; i < _amount; i++)
+        {
+            rolls.Add(Random.Next(1, _sides + 1));
+        }
+
+        Result = new ValueModel(rolls.Min(), $"({string.Join(", ", rolls)})kl");
+        return Task.FromResult(Result?.Value ?? -1);
+    }
+
+    protected static Modifier FilterModifier(string diceString)
+    {
+        if (diceString.EndsWith("kh"))
+        {
+            return Modifier.KeepHighest;
+        }
+        return diceString.EndsWith("kl") ? Modifier.KeepLowest : Modifier.None;
     }
 }

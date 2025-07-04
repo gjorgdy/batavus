@@ -1,17 +1,14 @@
 ﻿namespace Logic.Roll.Models;
 
-using Modifier = IRollable.Modifier;
-
 public class FlippableCoin : RollableDice
 {
-    public new string InputString => $"${Amount}c" + IRollable.ModifierSuffix(Mod);
 
-    private FlippableCoin(int amount, Modifier mod) : base(amount, 2, mod) {}
+    private FlippableCoin(int amount, Modifier mod, Random random) : base(amount, 2, mod, random) {}
 
-    public new static IRollable FromString(string diceString)
+    public new static MathComponent FromString(string diceString, Random random)
     {
         // Has 'kh' or 'kl' for keep highest or lowest
-        var mod = IRollable.FilterModifier(diceString);
+        var mod = FilterModifier(diceString);
         // Remove the modifier from the string if it exists
         if (mod != Modifier.None)
         {
@@ -25,7 +22,7 @@ public class FlippableCoin : RollableDice
         {
             throw new ArgumentException("Invalid coin format. Use format like '2c', '1ckh', or '3ckl'.");
         }
-        return new FlippableCoin(amount, mod);
+        return new FlippableCoin(amount, mod, random);
 
     }
 }

@@ -6,41 +6,64 @@ namespace Logic.Roll;
 public class RollCommand : ICommand<RollResponse>
 {
 
-    private List<IRollable> Rollables { get; }
+    private List<MathComponent> Components { get; set; }
 
     public RollCommand(string input)
     {
-        string[] components = input.Split('+', '-', '/');
-        Rollables = components.Select(component =>
-        {
-            component = component.Trim();
-
-            if (component.Contains('d'))
-            {
-                return RollableDice.FromString(component);
-            }
-
-            return component.Contains('c') ? FlippableCoin.FromString(component) : null;
-        })
-        .Where(rollable => rollable != null)
-        .Select(rollable => rollable!)
-        .ToList();
-        if (Rollables.Count == 0) throw new ArgumentException("No rollable components found in input.");
-    }
-
-    public Task<RollResponse> Execute()
-    {
+        string[] components = input.Split(' ');
         var random = new Random();
-        int total = Rollables.Select(async (r) =>
+        Components = components.Select(component =>
         {
-            await r.Roll(random);
-            return r.Result;
+            return component.Trim() switch
+            {
+                { } s when s.All(char.IsDigit) => MathComponent.ValueFromString(s),
+                { } s when s.Contains('d') => RollableDice.FromString(s, random),
+                { } s when s.Contains('c') => FlippableCoin.FromString(s, random),
+                "+" => new MathComponent(MathComponent.Type.Addition),
+                "-" => new MathComponent(MathComponent.Type.Subtraction),
+                _ => throw new ArgumentException(
+                    $"Component '{component}' is not a valid rollable or mathematical component.")
+            };
         })
-        .Sum(r => r.Result);
-
-        return Task.FromResult(new RollResponse(
-            Components: Rollables.Select(r => r.OutputString).ToArray(), // Placeholder for actual components));
-            Total: total // Placeholder for actual total
-        ));
+        .ToList();
     }
+
+    public async Task<RollResponse> Execute()
+    {
+        int total = 0;
+        List<string> strings = [];
+        bool add = true;
+        foreach (var t in Components)
+        {
+            switch (t.ComponentType)
+            {
+                case MathComponent.Type.Addition:
+                    add = true;
+                    strings.Add("+");
+                    continue;
+                case MathComponent.Type.Subtraction:
+                    add = false;
+                    strings.Add("-");
+                    continue;
+                case MathComponent.Type.Value:
+                    // Get the value from the component
+                    int res = t is IRollable rollable
+                        ? await rollable.Roll()
+                        : t.Result?.Value ?? 0;
+                    // If the rollable has a result, use it
+                    if (add) total += res;
+                    else total -= res;
+                    strings.Add(t.ToString());
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        return new RollResponse(
+            Components: strings.ToArray(), // Placeholder for actual components));
+            Total: total // Placeholder for actual total
+        );
+    }
+
 }
