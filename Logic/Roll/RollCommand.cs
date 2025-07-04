@@ -10,7 +10,7 @@ public class RollCommand : ICommand<RollResponse>
 
     public RollCommand(string input)
     {
-        string[] components = input.Split('+', '-', '/');
+        string[] components = input.Split('+', '-', '/', '*', ' ', '(', ')');
         Rollables = components.Select(component =>
         {
             component = component.Trim();

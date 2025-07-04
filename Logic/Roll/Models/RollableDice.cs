@@ -1,17 +1,39 @@
 ﻿namespace Logic.Roll.Models;
 
-using Modifier = IRollable.Modifier;
-
 public class RollableDice : IRollable
 {
+    protected enum Modifier
+    {
+        KeepHighest,
+        KeepLowest,
+        None
+    }
+
     public readonly int Amount;
     public readonly int Sides;
 
-    public string InputString => $"{Amount}d{Sides}" + IRollable.ModifierSuffix(Mod);
+    public string InputString => $"{Amount}d{Sides}" + ModifierSuffix(Mod);
     public string OutputString => $"{Result}";
 
     public int Result { get; private set; }
-    public Modifier Mod { get; init; }
+    protected Modifier Mod { get; set; }
+
+    public async Task Roll(Random random)
+    {
+        switch (Mod)
+        {
+            case Modifier.KeepHighest:
+                await RollKeepHighest(random);
+                break;
+            case Modifier.KeepLowest:
+                await RollKeepLowest(random);
+                break;
+            case Modifier.None:
+            default:
+                await RollTotal(random);
+                break;
+        }
+    }
 
     protected RollableDice(int amount, int sides, Modifier mod)
     {
@@ -24,7 +46,7 @@ public class RollableDice : IRollable
     public static IRollable FromString(string diceString)
     {
         // Has 'kh' or 'kl' for keep highest or lowest
-        var mod = IRollable.FilterModifier(diceString);
+        var mod = FilterModifier(diceString);
         // Remove the modifier from the string if it exists
         if (mod != Modifier.None)
         {
@@ -74,4 +96,25 @@ public class RollableDice : IRollable
         Result = rolls.Min();
         return Task.CompletedTask;
     }
+
+    protected static Modifier FilterModifier(string diceString)
+    {
+        if (diceString.EndsWith("kh"))
+        {
+            return Modifier.KeepHighest;
+        }
+        return diceString.EndsWith("kl") ? Modifier.KeepLowest : Modifier.None;
+    }
+
+    protected static string ModifierSuffix(Modifier mod)
+    {
+        return mod switch
+        {
+            Modifier.KeepHighest => "kh",
+            Modifier.KeepLowest => "kl",
+            _ => string.Empty
+        };
+    }
+
+    public string Value => Result.ToString();
 }

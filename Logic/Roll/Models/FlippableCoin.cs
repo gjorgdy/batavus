@@ -1,17 +1,17 @@
 ﻿namespace Logic.Roll.Models;
 
-using Modifier = IRollable.Modifier;
-
 public class FlippableCoin : RollableDice
 {
-    public new string InputString => $"${Amount}c" + IRollable.ModifierSuffix(Mod);
+    public new string InputString => $"${Amount}c" + ModifierSuffix(Mod);
+
+    public string Value => Result.ToString();
 
     private FlippableCoin(int amount, Modifier mod) : base(amount, 2, mod) {}
 
     public new static IRollable FromString(string diceString)
     {
         // Has 'kh' or 'kl' for keep highest or lowest
-        var mod = IRollable.FilterModifier(diceString);
+        var mod = FilterModifier(diceString);
         // Remove the modifier from the string if it exists
         if (mod != Modifier.None)
         {
