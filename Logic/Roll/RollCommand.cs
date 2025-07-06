@@ -31,7 +31,8 @@ public class RollCommand : ICommand<RollResponse>
     public async Task<RollResponse> Execute()
     {
         int total = 0;
-        List<string> strings = [];
+        List<string> resultStrings = [];
+        List<string> calculationStrings = [];
         bool add = true;
         foreach (var t in Components)
         {
@@ -39,12 +40,12 @@ public class RollCommand : ICommand<RollResponse>
             {
                 case MathComponent.Type.Addition:
                     add = true;
-                    strings.Add("+");
-                    continue;
+                    resultStrings.Add("+");
+                    break;
                 case MathComponent.Type.Subtraction:
                     add = false;
-                    strings.Add("-");
-                    continue;
+                    resultStrings.Add("-");
+                    break;
                 case MathComponent.Type.Value:
                     // Get the value from the component
                     int res = t is IRollable rollable
@@ -53,15 +54,17 @@ public class RollCommand : ICommand<RollResponse>
                     // If the rollable has a result, use it
                     if (add) total += res;
                     else total -= res;
-                    strings.Add(t.ToString());
+                    resultStrings.Add(res.ToString());
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+            calculationStrings.Add(t.ToString());
         }
 
         return new RollResponse(
-            Components: strings.ToArray(), // Placeholder for actual components));
+            ResultStrings: resultStrings.ToArray(),
+            CalculationStrings: calculationStrings.ToArray(), // Placeholder for actual components));
             Total: total // Placeholder for actual total
         );
     }

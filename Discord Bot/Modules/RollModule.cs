@@ -24,7 +24,7 @@ public class RollModule : InteractionModuleBase
 
             response = EmbedUtils.CreateBasicEmbed(
                 "Rolling " + input,
-                $"> {string.Join(" ", result.Components)}\n**= {result.Total}**",
+                $"*{string.Join(" ", result.ResultStrings)}*\n> {string.Join(" ", result.CalculationStrings)}\n**= {result.Total}**",
                 Color.Blue
             );
         }
