@@ -1,4 +1,4 @@
-﻿namespace Logic.Roll.Models;
+﻿namespace CoreModules.Roll.Models;
 
 public interface IRollable
 {

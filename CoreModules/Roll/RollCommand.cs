@@ -1,7 +1,7 @@
 ﻿using Core.Interfaces;
-using Logic.Roll.Models;
+using CoreModules.Roll.Models;
 
-namespace Logic.Roll;
+namespace CoreModules.Roll;
 
 public class RollCommand : ICommand<RollResponse>
 {

@@ -2,7 +2,7 @@
 using Discord;
 using Discord.Interactions;
 using JetBrains.Annotations;
-using Logic.Roll;
+using CoreModules.Roll;
 
 namespace Discord_Bot.Modules;
 
