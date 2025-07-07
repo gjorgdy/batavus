@@ -30,7 +30,8 @@ public static class Services
             })
             .AddSingleton<DiscordSocketClient>()
             .AddSingleton<IRestClientProvider, DiscordSocketClient>()
-            .AddSingleton<InteractionService>();
+            .AddSingleton<InteractionService>()
+            .AddScoped<HttpClient>();
         return collection.BuildServiceProvider();
     }
 
