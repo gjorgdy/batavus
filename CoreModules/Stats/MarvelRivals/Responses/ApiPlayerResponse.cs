@@ -10,8 +10,8 @@ public class ApiPlayerResponse
 
     public readonly struct UpdateSection
     {
-        [JsonProperty("last_history_update")]
-        public required DateTime Last { get; init; }
+        [JsonProperty("last_update_request")]
+        public DateTime? Last { get; init; }
     }
 
     [JsonProperty("player")]

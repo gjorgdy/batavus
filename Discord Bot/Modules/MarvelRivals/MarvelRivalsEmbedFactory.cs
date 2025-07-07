@@ -28,7 +28,7 @@ public static class MarvelRivalsEmbedFactory
         return new EmbedBuilder()
             .WithTitle($"{player.Data.Name}'s {pageTitle}")
             .WithThumbnailUrl(player.Data.Icon.Url)
-            .WithFooter("Batavus Bot - Marvel Rivals Stats");
+            .WithFooter($"last updated: {player.Updates.Last?.ToString("dd/MM/yyyy HH:mm") ?? "unknown"}");
     }
 
     public static Embed BuildMainStatsPage(MarvelRivalsPlayer player)

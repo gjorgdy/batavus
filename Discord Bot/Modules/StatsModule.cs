@@ -21,21 +21,25 @@ public class StatsModule(HttpClient httpClient) : InteractionModuleBase
         [Summary("hidden", "If only you should be able to see this command")] bool ephemeral = false
     )
     {
+        await DeferAsync(ephemeral: ephemeral);
         try
         {
             var player = await new PlayerCommand(httpClient, input)
                 .Execute();
-
-            await RespondAsync(
-                embed: MrEmbedFactory.BuildMainStatsPage(player),
-                components: MrEmbedFactory.BuildComponents(player, Pages.MainStats),
-                ephemeral: ephemeral
+            await ModifyOriginalResponseAsync(msg =>
+                {
+                    msg.Embed = MrEmbedFactory.BuildMainStatsPage(player);
+                    msg.Components = MrEmbedFactory.BuildComponents(player, Pages.MainStats);
+                }
             );
         }
         catch(Exception e)
         {
-            Console.Out.WriteLine(e);
-            await RespondAsync(embed: EmbedUtils.CreateErrorEmbed("Error", e.Message), ephemeral: true);
+            await ModifyOriginalResponseAsync(msg =>
+                {
+                    msg.Embed = EmbedUtils.CreateErrorEmbed("Error", e.Message);
+                }
+            );
         }
     }
 
