@@ -1,16 +1,18 @@
-﻿using Discord_Bot.Utils;
+﻿using CoreModules.Stats.MarvelRivals;
+using Discord_Bot.Modules.MarvelRivals;
+using Discord_Bot.Utils;
 using Discord;
 using Discord.Interactions;
+using Discord.WebSocket;
 using JetBrains.Annotations;
-using CoreModules.Stats.MarvelRivals.Commands;
 using MrEmbedFactory = Discord_Bot.Modules.MarvelRivals.MarvelRivalsEmbedFactory;
 using Pages = Discord_Bot.Modules.MarvelRivals.MarvelRivalsEmbedFactory.Pages;
 
 namespace Discord_Bot.Modules;
 
-[Group("stats", "Commands related to statistics of video games.")]
+// [Group("stats", "Commands related to statistics of video games.")]
 [UsedImplicitly] // This attribute is used to indicate that this method is used implicitly by the Discord library.
-public class StatsModule(HttpClient httpClient) : InteractionModuleBase
+public class StatsModule(MarvelRivalsPlayerService playerService) : InteractionModuleBase
 {
     [CommandContextType(InteractionContextType.Guild, InteractionContextType.BotDm, InteractionContextType.PrivateChannel)]
     [IntegrationType(ApplicationIntegrationType.UserInstall, ApplicationIntegrationType.GuildInstall)]
@@ -24,8 +26,7 @@ public class StatsModule(HttpClient httpClient) : InteractionModuleBase
         await DeferAsync(ephemeral: ephemeral);
         try
         {
-            var player = await new PlayerCommand(httpClient, input)
-                .Execute();
+            var player = await playerService.GetUser(input);
             await ModifyOriginalResponseAsync(msg =>
                 {
                     msg.Embed = MrEmbedFactory.BuildMainStatsPage(player);
@@ -40,6 +41,22 @@ public class StatsModule(HttpClient httpClient) : InteractionModuleBase
                     msg.Embed = EmbedUtils.CreateErrorEmbed("Error", e.Message);
                 }
             );
+        }
+    }
+
+    public async Task ButtonHandler(SocketMessageComponent component)
+    {
+        string customId = component.Data.CustomId;
+        string[] parts = customId.Split('_');
+        if (parts[0] != "smr") return;
+        if (parts[1] == "teammates")
+        {
+            var player = await playerService.GetUser(parts[2]);
+            await component.UpdateAsync(msg =>
+            {
+                msg.Embed = MrEmbedFactory.BuildTeammatesPage(player);
+                msg.Components = MrEmbedFactory.BuildComponents(player, Pages.Teammates);
+            });
         }
     }
 

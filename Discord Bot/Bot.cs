@@ -1,4 +1,5 @@
 ﻿using Core.Services;
+using Discord_Bot.Modules;
 using Discord_Bot.Modules.MarvelRivals;
 using Discord;
 using Discord.WebSocket;
@@ -48,7 +49,10 @@ public class Bot(LoggerService logger, DiscordSocketClient client, InteractionHa
             return Task.CompletedTask;
         };
 
-        client.ButtonExecuted += new MarvelRivalsButtonHandler(new HttpClient()).ButtonHandler;
+        client.ButtonExecuted += async (ctx) =>
+        {
+            await Services.Get<StatsModule>().ButtonHandler(ctx);
+        };
         // Start the client
         await client.StartAsync();
     }

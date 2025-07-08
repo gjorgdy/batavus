@@ -4,16 +4,16 @@ using Core.Interfaces;
 using CoreModules.Stats.MarvelRivals.Models;
 using Newtonsoft.Json;
 
-namespace CoreModules.Stats.MarvelRivals.Commands;
+namespace CoreModules.Stats.MarvelRivals;
 
-public class PlayerCommand(HttpClient httpClient, string player) : ICommand<MarvelRivalsPlayer>
+public class MarvelRivalsPlayerService(HttpClient httpClient)
 {
 
-    public async Task<MarvelRivalsPlayer> Execute()
+    public async Task<MarvelRivalsPlayer> GetUser(string playerIdentifier)
     {
         httpClient.DefaultRequestHeaders.Add("x-api-key", EnvironmentVars.MarvelRivalsApiKey);
         var response = await httpClient.GetAsync(
-            new Uri($"{MarvelRivalsStatsCommand.BaseUrl}/api/v1/player/{player}")
+            new Uri($"{MarvelRivalsStatsCommand.BaseUrl}/api/v1/player/{playerIdentifier}")
         );
 
         if (response.IsSuccessStatusCode)
@@ -28,11 +28,11 @@ public class PlayerCommand(HttpClient httpClient, string player) : ICommand<Marv
             or System.Net.HttpStatusCode.BadRequest
         )
         {
-            if (player.All(char.IsDigit))
+            if (playerIdentifier.All(char.IsDigit))
             {
-                throw new ArgumentException($"Player with uid '{player}' not found.");
+                throw new ArgumentException($"Player with uid '{playerIdentifier}' not found.");
             }
-            throw new ArgumentException($"Player '{player}' not found.");
+            throw new ArgumentException($"Player '{playerIdentifier}' not found.");
         }
 
         var errorResponse = await response.Content.ReadFromJsonAsync<ApiExceptionResponse>();

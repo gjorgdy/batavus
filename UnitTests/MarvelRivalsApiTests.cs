@@ -1,4 +1,4 @@
-using CoreModules.Stats.MarvelRivals.Commands;
+using CoreModules.Stats.MarvelRivals;
 using dotenv.net;
 
 namespace TestProject1;
@@ -19,7 +19,7 @@ public class MarvelRivalsApiTests
         var client = new HttpClient();
         try
         {
-            var res = await new PlayerCommand(client, "454597044").Execute();
+            var res = await new MarvelRivalsPlayerService(client).GetUser("454597044");
             await Console.Out.WriteLineAsync("Last update : " + res.Updates.Last);
             await Console.Out.WriteLineAsync("Player : " + res.Data.Name);
             await Console.Out.WriteLineAsync("Icon : " + res.Data.Icon.Url);

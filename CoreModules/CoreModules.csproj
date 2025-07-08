@@ -15,4 +15,8 @@
       <PackageReference Include="StringMathCalculator" Version="0.3.2" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Stats\MarvelRivals\Commands\" />
+    </ItemGroup>
+
 </Project>
