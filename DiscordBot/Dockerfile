@@ -5,19 +5,19 @@ WORKDIR /app
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["Discord Bot/Discord Bot.csproj", "Discord Bot/"]
+COPY ["DiscordBot/DiscordBot.csproj", "DiscordBot/"]
 COPY ["Core/Core.csproj", "Core/"]
 COPY ["CoreModules/CoreModules.csproj", "CoreModules/"]
-RUN dotnet restore "Discord Bot/Discord Bot.csproj"
+RUN dotnet restore "DiscordBot/DiscordBot.csproj"
 COPY . .
-WORKDIR "/src/Discord Bot"
-RUN dotnet build "./Discord Bot.csproj" -c $BUILD_CONFIGURATION -o /app/build
+WORKDIR "/src/DiscordBot"
+RUN dotnet build "./DiscordBot.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./Discord Bot.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./DiscordBot.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "Discord Bot.dll"]
+ENTRYPOINT ["dotnet", "DiscordBot.dll"]
