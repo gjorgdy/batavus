@@ -6,6 +6,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <RootNamespace>Discord_Bot</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
@@ -20,6 +21,9 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Content Include="..\.dockerignore">
+          <Link>.dockerignore</Link>
+        </Content>
         <Content Include="..\.env" Link=".env" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
 
