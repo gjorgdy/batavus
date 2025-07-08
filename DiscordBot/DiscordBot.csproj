@@ -24,7 +24,7 @@
         <Content Include="..\.dockerignore">
           <Link>.dockerignore</Link>
         </Content>
-        <Content Include="..\.env" Link=".env" CopyToOutputDirectory="PreserveNewest" />
+        <Content Include="..\.env" Link=".env" CopyToOutputDirectory="PreserveNewest" Condition="Exists('..\.env')" />
     </ItemGroup>
 
 </Project>
