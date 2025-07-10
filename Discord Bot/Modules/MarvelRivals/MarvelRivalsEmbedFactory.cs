@@ -66,15 +66,15 @@ public static class MarvelRivalsEmbedFactory
 
     public static Embed BuildUnrankedStatsPage(MarvelRivalsPlayer player)
     {
-        return BuildStatsPage(player, player.Stats.Unranked, BaseEmbedBuilder(player, "unranked stats"));
+        return BuildStatsPage(player.Stats.Unranked, BaseEmbedBuilder(player, "unranked stats"));
     }
 
     public static Embed BuildRankedStatsPage(MarvelRivalsPlayer player)
     {
-        return BuildStatsPage(player, player.Stats.Ranked, BaseEmbedBuilder(player, "ranked stats"));
+        return BuildStatsPage(player.Stats.Ranked, BaseEmbedBuilder(player, "ranked stats"));
     }
 
-    private static Embed BuildStatsPage(MarvelRivalsPlayer player, ApiPlayerResponse.StatsSection stats, EmbedBuilder embedBuilder)
+    private static Embed BuildStatsPage(ApiPlayerResponse.StatsSection stats, EmbedBuilder embedBuilder)
     {
         embedBuilder = embedBuilder
             // KDA
