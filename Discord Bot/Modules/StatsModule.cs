@@ -29,8 +29,8 @@ public class StatsModule(MarvelRivalsPlayerService playerService) : InteractionM
             var player = await playerService.GetUser(input);
             await ModifyOriginalResponseAsync(msg =>
                 {
-                    msg.Embed = MrEmbedFactory.BuildMainStatsPage(player);
-                    msg.Components = MrEmbedFactory.BuildComponents(player, Pages.MainStats);
+                    msg.Embed = MrEmbedFactory.BuildGeneralStatsPage(player);
+                    msg.Components = MrEmbedFactory.BuildComponents(player, Pages.GeneralStats);
                 }
             );
         }
@@ -65,8 +65,26 @@ public class StatsModule(MarvelRivalsPlayerService playerService) : InteractionM
             {
                 await component.UpdateAsync(msg =>
                 {
-                    msg.Embed = MrEmbedFactory.BuildMainStatsPage(player);
-                    msg.Components = MrEmbedFactory.BuildComponents(player, Pages.MainStats);
+                    msg.Embed = MrEmbedFactory.BuildGeneralStatsPage(player);
+                    msg.Components = MrEmbedFactory.BuildComponents(player, Pages.GeneralStats);
+                });
+                break;
+            }
+            case "ranked":
+            {
+                await component.UpdateAsync(msg =>
+                {
+                    msg.Embed = MrEmbedFactory.BuildRankedStatsPage(player);
+                    msg.Components = MrEmbedFactory.BuildComponents(player, Pages.Ranked);
+                });
+                break;
+            }
+            case "unranked":
+            {
+                await component.UpdateAsync(msg =>
+                {
+                    msg.Embed = MrEmbedFactory.BuildUnrankedStatsPage(player);
+                    msg.Components = MrEmbedFactory.BuildComponents(player, Pages.Unranked);
                 });
                 break;
             }

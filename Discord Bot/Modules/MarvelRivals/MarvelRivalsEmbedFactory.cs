@@ -1,4 +1,5 @@
 ﻿using CoreModules.Stats.MarvelRivals.Models;
+using CoreModules.Stats.MarvelRivals.Responses;
 using Discord_Bot.Utils;
 using Discord;
 
@@ -8,7 +9,7 @@ public static class MarvelRivalsEmbedFactory
 {
     public enum Pages
     {
-        MainStats,
+        GeneralStats,
         Teammates,
         Unranked,
         Ranked
@@ -16,9 +17,16 @@ public static class MarvelRivalsEmbedFactory
 
     public static MessageComponent BuildComponents(MarvelRivalsPlayer player, Pages page)
     {
+        bool isMainStats = page == Pages.GeneralStats;
+        bool isTeammates = page == Pages.Teammates;
+        bool isUnranked = page == Pages.Unranked;
+        bool isRanked = page == Pages.Ranked;
+
         return new ComponentBuilder()
-            .WithButton("Main Stats", $"smr_stats_{player.Data.Uid}", page == Pages.MainStats ? ButtonStyle.Primary : ButtonStyle.Secondary)
-            .WithButton("Teammates", $"smr_teammates_{player.Data.Uid}", page == Pages.Teammates ? ButtonStyle.Primary : ButtonStyle.Secondary)
+            .WithButton("Main Stats", $"smr_stats_{player.Data.Uid}", isMainStats ? ButtonStyle.Primary : ButtonStyle.Secondary, disabled: isMainStats)
+            .WithButton("Teammates", $"smr_teammates_{player.Data.Uid}", isTeammates ? ButtonStyle.Primary : ButtonStyle.Secondary, disabled: isTeammates)
+            .WithButton("Unranked", $"smr_unranked_{player.Data.Uid}", isUnranked ? ButtonStyle.Primary : ButtonStyle.Secondary, disabled: isUnranked)
+            .WithButton("Ranked", $"smr_ranked_{player.Data.Uid}", isRanked ? ButtonStyle.Primary : ButtonStyle.Secondary, disabled: isRanked)
             .WithButton("tracker.gg", style: ButtonStyle.Link, url: $"https://tracker.gg/marvel-rivals/profile/ign/{player.Data.Name}")
             .Build();
     }
@@ -34,7 +42,7 @@ public static class MarvelRivalsEmbedFactory
             : embedBuilder;
     }
 
-    public static Embed BuildMainStatsPage(MarvelRivalsPlayer player)
+    public static Embed BuildGeneralStatsPage(MarvelRivalsPlayer player)
     {
         var embedBuilder = BaseEmbedBuilder(player, "stats")
             .AddField("Team", player.Data.Team.Name, true)
@@ -48,10 +56,41 @@ public static class MarvelRivalsEmbedFactory
         }
         // Add stats
         embedBuilder = embedBuilder
-            .AddField("Winrate", $"{player.Stats.AverageWinRate:F}%", true)
             .AddField("MVPs", player.Stats.TotalMvpCount, true)
             .AddField("SVPs", player.Stats.TotalSvpCount, true)
-            .AddField("KDA", $"{player.Stats.AverageKda:F}", true);
+            .AddField("KDA", $"{player.Stats.AverageKda:F}", true)
+            .AddField("Winrate", $"{player.Stats.AverageWinRate:F}%", true);
+
+        return embedBuilder.Build();
+    }
+
+    public static Embed BuildUnrankedStatsPage(MarvelRivalsPlayer player)
+    {
+        return BuildStatsPage(player, player.Stats.Unranked, BaseEmbedBuilder(player, "unranked stats"));
+    }
+
+    public static Embed BuildRankedStatsPage(MarvelRivalsPlayer player)
+    {
+        return BuildStatsPage(player, player.Stats.Ranked, BaseEmbedBuilder(player, "ranked stats"));
+    }
+
+    private static Embed BuildStatsPage(MarvelRivalsPlayer player, ApiPlayerResponse.StatsSection stats, EmbedBuilder embedBuilder)
+    {
+        embedBuilder = embedBuilder
+            // KDA
+            .AddField("Kills", stats.Kills, true)
+            .AddField("Deaths", stats.Deaths, true)
+            .AddField("Assists", stats.Assists, true)
+            // Averages
+            .AddField("KDA", $"{stats.Kda:F}", true)
+            .AddField("MVPs", stats.MvpCount, true)
+            .AddField("SVPs", stats.SvpCount, true)
+            // Matches and Winrate
+            .AddField("Matches", stats.Matches, true)
+            .AddField("Wins", stats.Wins, true)
+            .AddField("Winrate", $"{stats.WinRate:F}%", true)
+            // Time played
+            .AddField("Time Played", $"{stats.TimePlayed.Hours}h {stats.TimePlayed.Minutes}m {stats.TimePlayed.Seconds}s", true);
 
         return embedBuilder.Build();
     }

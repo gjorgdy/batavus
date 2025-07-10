@@ -55,7 +55,7 @@ public class ApiPlayerResponse
     {
         [JsonIgnore]
         public double WinRate =>
-            Matches > 0 ? ((double) Wins / Matches) * 100 : 0;
+            Matches > 0 ? ((double) Wins / Matches) * 100.0 : 0;
 
         [JsonProperty("total_matches")]
         public required int Matches { get; init; }

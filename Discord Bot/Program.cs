@@ -1,7 +1,5 @@
 ﻿using Core.Config;
 using Core.Services;
-using Discord;
-using Discord.WebSocket;
 using dotenv.net;
 
 namespace Discord_Bot;
