@@ -106,14 +106,14 @@ public static class MarvelRivalsEmbedFactory
             embedBuilder = embedBuilder
                 .AddField("Best Team Mate", bestTeamMate.PlayerData.Name, true)
                 .AddField("Matches", bestTeamMate.Matches, true)
-                .AddField("Win Rate", (bestTeamMate.WinRate / 100) + "%", true);
+                .AddField("Win Rate", $"{bestTeamMate.WinRate:F}%", true);
 
             var mostCommonTeamMate = player.Teammates
                 .MaxBy(tm => tm.Matches);
             embedBuilder = embedBuilder
                 .AddField("Most Common Team Mate", mostCommonTeamMate.PlayerData.Name, true)
                 .AddField("Matches", mostCommonTeamMate.Matches, true)
-                .AddField("Win Rate", (mostCommonTeamMate.WinRate / 100) + "%", true);
+                .AddField("Win Rate", $"{mostCommonTeamMate.WinRate:F}%", true);
         }
         else
         {
