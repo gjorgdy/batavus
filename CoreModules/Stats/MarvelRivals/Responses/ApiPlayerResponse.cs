@@ -159,7 +159,7 @@ public class ApiPlayerResponse
         public required string WinRateString { private get; init; }
 
         [JsonIgnore]
-        public double WinRate => double.Parse(WinRateString);
+        public double WinRate => double.Parse(WinRateString) / 100.0;
     }
 
     public readonly struct TeamMatePlayerInfoSection
