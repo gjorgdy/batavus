@@ -49,14 +49,27 @@ public class StatsModule(MarvelRivalsPlayerService playerService) : InteractionM
         string customId = component.Data.CustomId;
         string[] parts = customId.Split('_');
         if (parts[0] != "smr") return;
-        if (parts[1] == "teammates")
+        var player = await playerService.GetUser(parts[2]);
+        switch (parts[1])
         {
-            var player = await playerService.GetUser(parts[2]);
-            await component.UpdateAsync(msg =>
+            case "teammates":
             {
-                msg.Embed = MrEmbedFactory.BuildTeammatesPage(player);
-                msg.Components = MrEmbedFactory.BuildComponents(player, Pages.Teammates);
-            });
+                await component.UpdateAsync(msg =>
+                {
+                    msg.Embed = MrEmbedFactory.BuildTeammatesPage(player);
+                    msg.Components = MrEmbedFactory.BuildComponents(player, Pages.Teammates);
+                });
+                break;
+            }
+            case "stats":
+            {
+                await component.UpdateAsync(msg =>
+                {
+                    msg.Embed = MrEmbedFactory.BuildMainStatsPage(player);
+                    msg.Components = MrEmbedFactory.BuildComponents(player, Pages.MainStats);
+                });
+                break;
+            }
         }
     }
 

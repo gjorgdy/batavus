@@ -1,5 +1,6 @@
 ﻿using Core.Services;
 using CoreModules.Stats.MarvelRivals;
+using Discord_Bot.Modules;
 using Discord;
 using Discord.Interactions;
 using Discord.Rest;
@@ -31,9 +32,11 @@ public static class Services
             .AddSingleton<DiscordSocketClient>()
             .AddSingleton<IRestClientProvider, DiscordSocketClient>()
             // Scoped services
-            .AddScoped<HttpClient>()
+            .AddTransient<HttpClient>()
             // Transient services, modules
-            .AddTransient<MarvelRivalsPlayerService>();
+            .AddTransient<MarvelRivalsPlayerService>()
+            // Discord modules
+            .AddTransient<StatsModule>();
         return collection.BuildServiceProvider();
     }
 
