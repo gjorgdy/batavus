@@ -1,9 +1,10 @@
-﻿using Core.Interfaces;
-using Core.Services;
+﻿using Core.Services;
+using CoreModules.Stats.MarvelRivals;
+using Discord_Bot.Modules;
 using Discord;
-using Discord.Interactions;
 using Discord.Rest;
 using Discord.WebSocket;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Discord_Bot;
@@ -29,8 +30,14 @@ public static class Services
                 GatewayIntents = GatewayIntents.Guilds,
             })
             .AddSingleton<DiscordSocketClient>()
+            .AddSingleton(new MemoryCache(new MemoryCacheOptions()))
             .AddSingleton<IRestClientProvider, DiscordSocketClient>()
-            .AddSingleton<InteractionService>();
+            // Scoped services
+            .AddTransient<HttpClient>()
+            // Transient services, modules
+            .AddTransient<MarvelRivalsPlayerService>()
+            // Discord modules
+            .AddTransient<StatsModule>();
         return collection.BuildServiceProvider();
     }
 

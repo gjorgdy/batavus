@@ -12,4 +12,5 @@ public static class EnvironmentVars
             return tryParse ? guildId : null;
         }
     }
+    public static string? MarvelRivalsApiKey => Environment.GetEnvironmentVariable("MARVEL_RIVALS_API_KEY");
 }
