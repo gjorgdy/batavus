@@ -1,17 +1,17 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace CoreModules.Stats.MarvelRivals.Models;
+namespace CoreModules.Stats.MarvelRivals.Responses;
 
 public struct ApiExceptionResponse
 {
 
     [JsonPropertyName("error")]
-    public bool Error { get; }
+    public required bool Error { get; init; }
 
     [JsonPropertyName("message")]
-    public string Message { get; }
+    public required string Message { get; init; }
 
     [JsonPropertyName("status")]
-    public int Status { get; }
+    public required int Status { get; init; }
 
 }

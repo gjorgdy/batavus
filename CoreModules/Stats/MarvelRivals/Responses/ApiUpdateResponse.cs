@@ -1,12 +1,12 @@
 ﻿using Newtonsoft.Json;
 
-namespace CoreModules.Stats.MarvelRivals.Models;
+namespace CoreModules.Stats.MarvelRivals.Responses;
 
 public class ApiUpdateResponse
 {
     [JsonProperty("success")]
-    public bool Success { get; set; }
+    public required bool Success { get; set; }
 
     [JsonProperty("message")]
-    public string Message { get; set; }
+    public required string Message { get; set; }
 }

@@ -119,7 +119,7 @@ public class ApiPlayerResponse
         public required string Path { private get; init; }
 
         [JsonIgnore]
-        public string Url => MarvelRivalsStatsCommand.BaseUrl + "/rivals" + Path;
+        public string Url => MarvelRivalsPlayerService.BaseUrl + "/rivals" + Path;
 
         [JsonProperty("color")]
         public required string Color { get; init; }
@@ -143,7 +143,7 @@ public class ApiPlayerResponse
         public required string Path { private get; init; }
 
         [JsonIgnore]
-        public string Url => MarvelRivalsStatsCommand.BaseUrl + "/rivals" + Path;
+        public string Url => MarvelRivalsPlayerService.BaseUrl + "/rivals" + Path;
 
     }
 
