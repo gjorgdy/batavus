@@ -100,9 +100,11 @@ public static class MarvelRivalsEmbedFactory
         var embedBuilder = BaseEmbedBuilder(player, "teammates");
         if (player.Teammates.Length > 0)
         {
-            var bestTeamMate = player.Teammates
-                .Where(tm => tm.Matches > 5)
-                .MaxBy(tm => tm.WinRate);
+            // filter only if any common teammates
+            var bestTeamMate = player.Teammates.Any(tm => tm.Matches > 5)
+                ? player.Teammates.Where(tm => tm.Matches > 5).MaxBy(tm => tm.WinRate)
+                : player.Teammates.MaxBy(tm => tm.WinRate);
+
             embedBuilder = embedBuilder
                 .AddField("Best Team Mate", bestTeamMate.PlayerData.Name, true)
                 .AddField("Matches", bestTeamMate.Matches, true)
